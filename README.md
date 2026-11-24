@@ -3,9 +3,9 @@
 ## Project description:
 This project has been made for my thesis, which will assess whether object movability and manipulation safety can be predicted from single-frame sensor data.
 
-The project consists of 2 files: "project.py" and "resize_and_test.py". The first utilises ai2thor predefined scenes (120 in total) by taking random shots and counting all objects present. The ground truth is assembled and object data is passed in a pickle file labeled "ai2thor_dataset.pkl" (name of final version), which will be used for training and testing.
+The project consists of 2 files: `project.py` and `resize_and_test.py`. The first utilises ai2thor predefined scenes (120 in total) by taking random shots and counting all objects present. The ground truth is assembled and object data is passed in a pickle file labeled `ai2thor_dataset.pkl` (name of final version; current file name - as of 24 nov 2026 - is `ai2thor_dataset_v2_800x600.pkl`), which will be used for training and testing.
 
-The model in the second file utilises ResNet-18 as convolutional layers (initialised on ImageNet weights) using AI2-THOR metadata, across 3 conditions: rgb-only, depth, and fused(rgb+depth). The model will compute the accuracy, AUC, precision, and f1 score of each objects, based on how unsafe it is
+The model in the second file utilises `ResNet-18` as convolutional layers (initialised on `ImageNet` weights) using AI2-THOR metadata, across 3 conditions: rgb-only, depth, and fused(rgb+depth). The model will compute the `accuracy`, `AUC`, `precision`, and `f1 score` of each objects, based on how unsafe it is
 - For this project, unsafe will be defined as `breakable AND pickupable`
 
 ## Imports used:
@@ -14,21 +14,23 @@ The model in the second file utilises ResNet-18 as convolutional layers (initial
 
 ## Setup:
 In order to run this project, one will need Python version 3.12, as well as the libraries mentioned above. 
-Because AI2Thor struggles with a vulkan environment or in cloud computing (e.g. Colab), I recommend to use this code on a machine with Linux installed, or through WSL(Windows Subsystem for Linux) with Ubuntu (which can be found in the Windows Appstore).
+Because AI2-THOR struggles with a Vulkan environment or in cloud computing (e.g. Colab), I recommend to use this code on a machine with a `Linux` distribution installed, or through `WSL` (Windows Subsystem for Linux) with `Ubuntu` (which can be found in the Windows Appstore).
+- Small note: During the AI2-THOR installation, it will attempt to install all the scenes, which are about `800 MB` in total. 
+- Smaller note: The installation took me about an hour to complete.
 
 ## Key settings:
 The project relies on key settings, which can/will alter the final metrics:
--  MASS_TRESHOLD_KG: refers to the threshold which will be considered as movable in both of the files. In AI2THOR, many of the objects are considered unmovable by default after ~22kg, so I have used 20kg as the main threshold for this experiment. Lowering or increasing this value will change the number of objects included in the final pickle file, and wil change the outputted metrics.
-- MIN_VISIBLE_PX: refers to the visibility of the object. The robot collects views of the scenes in a 800x600 format. The variable refers to the number of pixels the objects needs to have in the scene in order to be used in the model computations. Changing this variable will result in more or less objects being found and will modify the final results.
-- GROUP_BY How cross-validation folds are built. `"object_type"` holds out whole object types (tests generalisation to unseen types, the hardest setting). `"scene"` holds out whole scenes (types are seen in training, new scenes at test). `"object_id"` holds out individual objects. All views of one group stay in the same fold 
-- SEEDS Random seeds. Each seed gives a different fold split, weight initialisation and augmentation. Results are reported as mean ± std over seeds 
-- CONDS Input conditions to run: `"rgb"`, `"depth"`, `"fused"` 
+-  `MASS_TRESHOLD_KG`: refers to the threshold which will be considered as movable in both of the files. In AI2-THOR, many of the objects are considered unmovable by default after `~22kg`, so I have used `20kg` as the main threshold for this experiment. Lowering or increasing this value will change the number of objects included in the final pickle file, and wil change the outputted metrics.
+- `MIN_VISIBLE_PX`: refers to the visibility of the object. The robot collects views of the scenes in a 800x600 format. The variable refers to the number of pixels the objects needs to have in the scene in order to be used in the model computations. Changing this variable will result in more or less objects being found and will modify the final results.
+- `GROUP_BY`: refers to how cross-validation folds are built. `"object_type"` holds out whole object types (tests generalisation to unseen types, the hardest setting). `"scene"` holds out whole scenes (types are seen in training, new scenes at test). `"object_id"` holds out individual objects. All views of one group stay in the same fold 
+- `SEEDS`: refers to random seeds. Each seed gives a different fold split, weight initialisation and augmentation. Results are reported as mean ± std over seeds 
+- `CONDS`: refers to input conditions to run: `"rgb"`, `"depth"`, `"fused"` 
 
 ## How to run:
-During the first start, you will need to run "project.py" first, and then "resize_and_test.py" because the second file relies solely on the pickle file generated by the first.
-- Small note: the full run will take a while based on the machine you have used. On my current machine (8GB RAM, Intel i5-10300H, NVIDIA GTX 1650 - 4GB VRAM) it takes from 1 up to 3 hours. For a quick run, one can change the range of scenes in the project.py file, from _31 (30 scenes by room type) to _11 (10 scenes per room type) to even __1 (1 scene per room type)
+During the first start, you will need to run `project.py` first, and then `resize_and_test.py` because the second file relies solely on the pickle file generated by the first.
+- Small note: the full run will take a while based on the machine you have used. On my current machine (8GB RAM, Intel i5-10300H, NVIDIA GTX 1650 - 4GB VRAM) it takes from 1 up to 3 hours. For a quick run, one can change the range of scenes in the project.py file, from `_31` (30 scenes by room type) to `_11` (10 scenes per room type) to even `__1` (1 scene per room type)
 
 ## Output:
 The code will generates different plots and images, all which can be found in `"output/environments"` or `"output/plots/<type>"`.
 - Small note: Some of the information about the ground truth or the metrics will be displayed in the terminal (as of 24 nov 2026, might change with a later version and will be mentioned)
-- Small note: SAVE_PER_OBJECT_PLOTS is turned off by default, so do make sure to check before running the files.
+- Smaller note: `SAVE_PER_OBJECT_PLOTS` is turned off by default, so do make sure to check before running the files.
